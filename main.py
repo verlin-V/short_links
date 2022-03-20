@@ -1,4 +1,4 @@
-import hashlib
+from uuid import uuid4
 
 from flask import Flask, abort, redirect, request
 
@@ -7,6 +7,11 @@ app = Flask(__name__)
 FAKE_TABLE = {
     'hgrdy43': 'https://google.com/',
 }
+
+
+def _get_free_hash():
+    while (hash_val := str(uuid4())[:8]) not in FAKE_TABLE:
+        return hash_val
 
 
 @app.route('/<hash_url>', methods=['GET', 'DELETE'])
@@ -28,7 +33,7 @@ def add_short_link():
     except KeyError:
         return '"url" was expected in body', 400
 
-    hash_url = hashlib.md5(url.encode('UTF-8')).hexdigest()
+    hash_url = _get_free_hash()
     FAKE_TABLE[hash_url] = url
     return f'{request.url_root}{hash_url}'
 
