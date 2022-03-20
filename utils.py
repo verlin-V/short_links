@@ -21,7 +21,7 @@ def hash_exists(hash_url):
         return cur.fetchone()[0]
 
 
-def add_short_link(link, hash_url):
+def add_short_link_to_database(link, hash_url):
     with conn.cursor() as cur:
         cur.execute(
             f'''

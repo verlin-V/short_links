@@ -1,11 +1,12 @@
 from unittest import TestCase
+
 from dotenv import load_dotenv
 
 load_dotenv('env/test.env')
 
 from utils import (
     hash_exists,
-    add_short_link,
+    add_short_link_to_database,
     conn,
     delete_link,
     get_link_by_hash,
@@ -56,7 +57,7 @@ class DBMethodsTestCase(TestCase):
             True
         )[0][0]
 
-        add_short_link(link_val, hash_val)
+        add_short_link_to_database(link_val, hash_val)
 
         count_of_specific_links_upd = _run_sql(
             self.SQL_FORMAT_COUNT_OF_LINKS_WITH_SPECIFIC_HASH.format(hash_val),
