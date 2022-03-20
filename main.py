@@ -8,12 +8,17 @@ FAKE_TABLE = {
     'hgrdy43': 'https://google.com/',
 }
 
-@app.route('/<hash>')
-def redirect_to_saved_link(hash):
-    if hash in FAKE_TABLE:
-        return redirect(FAKE_TABLE[hash], code=301)
-    else:
-        return abort(404)
+
+@app.route('/<hash_url>', methods=['GET', 'DELETE'])
+def short_link(hash_url):
+    if request.method == 'GET':
+        if hash_url in FAKE_TABLE:
+            return redirect(FAKE_TABLE[hash_url], code=301)
+        else:
+            return abort(404)
+    elif request.method == 'DELETE':
+        FAKE_TABLE.pop(hash_url, None)
+        return '', 204
 
 
 @app.route('/add', methods=['POST'])
