@@ -1,28 +1,34 @@
 from uuid import uuid4
 
+from dotenv import load_dotenv
+
+load_dotenv('env/.env')
+
+from utils import (
+    hash_exists,
+    get_link_by_hash,
+    delete_link,
+    add_short_link_to_database,
+)
 from flask import Flask, abort, redirect, request
 
 app = Flask(__name__)
 
-FAKE_TABLE = {
-    'hgrdy43': 'https://google.com/',
-}
-
 
 def _get_free_hash():
-    while (hash_val := str(uuid4())[:8]) not in FAKE_TABLE:
+    while not hash_exists(hash_val := str(uuid4())[:8]):
         return hash_val
 
 
 @app.route('/<hash_url>', methods=['GET', 'DELETE'])
 def short_link(hash_url):
     if request.method == 'GET':
-        if hash_url in FAKE_TABLE:
-            return redirect(FAKE_TABLE[hash_url], code=301)
+        if hash_exists(hash_url):
+            return redirect(get_link_by_hash(hash_url), code=301)
         else:
             return abort(404)
     elif request.method == 'DELETE':
-        FAKE_TABLE.pop(hash_url, None)
+        delete_link(hash_url)
         return '', 204
 
 
@@ -34,7 +40,7 @@ def add_short_link():
         return '"url" was expected in body', 400
 
     hash_url = _get_free_hash()
-    FAKE_TABLE[hash_url] = url
+    add_short_link_to_database(url, hash_url)
     return f'{request.url_root}{hash_url}'
 
 
