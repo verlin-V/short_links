@@ -1,4 +1,4 @@
-from _datetime import datetime
+from datetime import datetime
 import os
 
 import psycopg2
@@ -52,3 +52,13 @@ def get_link_by_hash(hash_url):
             '''
         )
         return cur.fetchone()[0]
+
+
+def delete_expired_links():
+    with conn.cursor() as cur:
+        cur.execute(
+            f'''
+            DELETE FROM short_link
+            WHERE expired < '{datetime.now()}'
+            '''
+        )

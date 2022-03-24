@@ -110,3 +110,25 @@ class DBMethodsTestCase(TestCase):
             _run_sql(sql_code, True)[0][0],
             get_link_by_hash(self.hash_val)
         )
+
+    def test_delete_expired_links_deletes_expired_link(self):
+        hash1 = '00000000'
+        hash2 = '00000001'
+        _run_sql(
+            self.SQL_FORMAT_ADD_SHORT_LINK.format(
+                self.link_val, hash1, datetime.now() + timedelta(days=2)
+            )
+        )
+        _run_sql(
+            self.SQL_FORMAT_ADD_SHORT_LINK.format(
+                self.link_val, hash2, datetime.now() - timedelta(seconds=1)
+            )
+        )
+        delete_expired_links()
+
+        self.assertTrue(
+            _run_sql(self.SQL_FORMAT_RETRIEVE_LINK.format(hash1), True)
+        )
+        self.assertFalse(
+            _run_sql(self.SQL_FORMAT_RETRIEVE_LINK.format(hash2), True)
+        )
