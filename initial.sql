@@ -27,7 +27,8 @@ SET default_table_access_method = heap;
 CREATE TABLE public.short_link (
     id integer NOT NULL,
     link character varying(2048),
-    hash character varying(8)
+    hash character varying(8),
+    expired timestamp with time zone NOT NULL
 );
 
 

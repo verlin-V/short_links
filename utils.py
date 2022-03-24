@@ -1,4 +1,6 @@
+from _datetime import datetime
 import os
+
 import psycopg2
 
 conn = psycopg2.connect(
@@ -21,12 +23,12 @@ def hash_exists(hash_url):
         return cur.fetchone()[0]
 
 
-def add_short_link_to_database(link, hash_url):
+def add_short_link_to_database(link, hash_url, expired: datetime):
     with conn.cursor() as cur:
         cur.execute(
             f'''
-           INSERT INTO short_link (link, hash)
-           VALUES ('{link}', '{hash_url}')
+           INSERT INTO short_link (link, hash, expired)
+           VALUES ('{link}', '{hash_url}', '{expired.isoformat()}')
            '''
         )
 

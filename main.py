@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from uuid import uuid4
 
 from dotenv import load_dotenv
@@ -13,6 +14,9 @@ from utils import (
 from flask import Flask, abort, redirect, request
 
 app = Flask(__name__)
+
+DEFAULT_STORING_TERM_DAYS = 7
+PREPAID_STORING_TERM_DAYS = 30
 
 
 def _get_free_hash():
@@ -39,8 +43,13 @@ def add_short_link():
     except KeyError:
         return '"url" was expected in body', 400
 
+    if request.json.get('prepaid'):
+        expired = datetime.now() + timedelta(days=PREPAID_STORING_TERM_DAYS)
+    else:
+        expired = datetime.now() + timedelta(days=DEFAULT_STORING_TERM_DAYS)
+
     hash_url = _get_free_hash()
-    add_short_link_to_database(url, hash_url)
+    add_short_link_to_database(url, hash_url, expired)
     return f'{request.url_root}{hash_url}'
 
 
